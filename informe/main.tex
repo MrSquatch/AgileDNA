@@ -1,0 +1,102 @@
+\documentclass{article}
+
+% === Plantilla del profesor ===
+\usepackage[
+left=4cm,
+right=2.5cm,
+top=2.5cm,
+bottom=2.5cm
+]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{tcolorbox}
+\usepackage{longtable}
+
+% Colores para código
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+\definecolor{codeblue}{rgb}{0,0,1}
+\definecolor{codered}{rgb}{1,0,0}
+
+% Estilo de código
+\lstdefinestyle{matlabstyle}{
+  backgroundcolor=\color{backcolour},   
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{codeblue},
+  stringstyle=\color{codered},
+  basicstyle=\ttfamily\small,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=t,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2,
+  frame=single
+}
+
+% Cajas de contenido
+\tcbset{
+  conclusion/.style={
+    colback=green!10,
+    colframe=green!50!black,
+    fonttitle=\bfseries,
+    title=Conclusión
+  },
+  ejercicio/.style={
+    colback=yellow!10,
+    colframe=yellow!50!black,
+    fonttitle=\bfseries,
+    title=Ejercicio: Comportamiento de un Servidor Web Bajo Carga Constante
+  },
+  contexto/.style={
+    colback=blue!10,
+    colframe=blue!50!black,
+    fonttitle=\bfseries,
+    title=Contexto
+  }
+}
+
+% === Inicio del contenido ===
+\begin{document}
+
+\section*{Prueba de la plantilla del profesor}
+
+Este es un pequeño ejemplo para comprobar que todo está funcionando correctamente. Aquí mostramos una fórmula matemática:
+
+\[
+f(x) = x^2 + 3x + 2
+\]
+
+Y también un ejemplo de código con estilo personalizado:
+
+\begin{lstlisting}[style=matlabstyle, language=Python, caption={Algoritmo simple}]
+def cuadrado(x):
+    return x * x
+
+print(cuadrado(5))
+\end{lstlisting}
+
+\begin{tcolorbox}[contexto]
+Este recuadro representa un contexto teórico que podrías usar en tu informe.
+\end{tcolorbox}
+
+\begin{tcolorbox}[ejercicio]
+Desarrolla un experimento para verificar el rendimiento de tu algoritmo genético con distintos tamaños de población.
+\end{tcolorbox}
+
+\begin{tcolorbox}[conclusion]
+La plantilla se ha compilado correctamente. Puedes comenzar a escribir tu informe a partir de esta base.
+\end{tcolorbox}
+
+\end{document}
