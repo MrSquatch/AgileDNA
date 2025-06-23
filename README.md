@@ -1,12 +1,12 @@
 # 🧬 AgileDNA: Asignación Ágil de Tareas con Algoritmos Genéticos
 
-Proyecto académico desarrollado para el curso de *Automatización y Control de Software* que explora el uso de algoritmos genéticos para automatizar la asignación de tareas en entornos ágiles como SCRUM.
+Proyecto académico desarrollado como parte del curso de *Automatización y Control de Software*, cuyo objetivo es aplicar algoritmos genéticos para automatizar la asignación eficiente de tareas en marcos ágiles como SCRUM, explorando técnicas de optimización inspiradas en la evolución natural para mejorar la planificación y ejecución de proyectos de software.
 
-Este repositorio contiene tanto el **informe académico** como la **implementación práctica** del proyecto desarrollado durante el ciclo 2025.
+Este repositorio contiene tanto el **informe académico** como la **implementación práctica** desarrollados durante el ciclo 2025.
 
 ## 📁 Estructura general
 
-- `informe/`: Contiene el informe en LaTeX, incluyendo secciones modulares, referencias APA 7 y documentación interna.
+- `informe/`: Contiene el informe en LaTeX, incluyendo secciones modulares, referencias en formato APA 7 y documentación interna.
 - `implementacion/`: (En desarrollo) Aquí se ubicará el código fuente y la implementación del algoritmo propuesto.
 
 ## 📄 Estado actual
@@ -16,7 +16,7 @@ Este repositorio contiene tanto el **informe académico** como la **implementaci
 
 ## ⚠️ Notas
 
-Este repositorio está diseñado para facilitar el trabajo en equipo. Revisa la carpeta `informe/documentacion/` para ver cómo compilar el informe y entender su estructura.
+Este repositorio está diseñado para facilitar el trabajo en equipo. Revisa la carpeta [`informe/documentacion/`](informe/documentacion/) para ver cómo compilar el informe y entender su estructura.
 
 ---
 
