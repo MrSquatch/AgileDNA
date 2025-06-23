@@ -1,6 +1,8 @@
-# 🧬 Proyecto de Automatización y Control de Software
+# 🧬 AgileDNA: Asignación Ágil de Tareas con Algoritmos Genéticos
 
-Este repositorio contiene tanto el **informe académico** como la **implementación práctica** del proyecto del curso **Automatización y Control de Software** (2025).
+Proyecto académico desarrollado para el curso de *Automatización y Control de Software* que explora el uso de algoritmos genéticos para automatizar la asignación de tareas en entornos ágiles como SCRUM incluyendo un informe técnico en LaTeX, documentación modular y código fuente funcional. 
+
+Este repositorio contiene tanto el **informe académico** como la **implementación práctica** del proyecto desarrollado durante el ciclo 2025.
 
 ## 📁 Estructura general
 
