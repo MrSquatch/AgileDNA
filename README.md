@@ -16,7 +16,7 @@ Este repositorio contiene tanto el **informe académico** como la **implementaci
 
 ## ⚠️ Notas
 
-Este repositorio está diseñado para facilitar el trabajo en equipo. Revisa la carpeta [`informe/documentacion/`](informe/documentacion/) para ver cómo compilar el informe y entender su estructura.
+Este repositorio está diseñado para facilitar el trabajo en equipo. Revisa el archivo [`informe/README.md`](informe/README.md) para ver cómo compilar el informe y entender su estructura.
 
 ---
 
