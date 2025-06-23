@@ -1,26 +1,16 @@
 \newpage
-\section{Bibliografía}
 
-\begin{thebibliography}{99}
-
-  \bibitem{scrum-guide}
-  Schwaber, K. \& Sutherland, J. (2020). \textit{The Scrum Guide}. Scrum.org. Disponible en: \url{https://scrumguides.org}
-
-  \bibitem{goldberg}
-  Goldberg, D. E. (1989). \textit{Genetic Algorithms in Search, Optimization and Machine Learning}. Addison-Wesley.
-
-  \bibitem{devops}
-  Humble, J., \& Farley, D. (2010). \textit{Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation}. Addison-Wesley.
-
-  \bibitem{apa7}
-  American Psychological Association. (2020). \textit{Publication Manual of the American Psychological Association} (7th ed.).
-
-\end{thebibliography}
+\begingroup
+% Espacio extra entre referencias (pero sin interlineado doble)
+\setlength{\bibitemsep}{8pt}   % ≈ medio renglón; cambia 8 pt a lo que prefieras
+\section*{Bibliografía}
+\printbibliography[heading=none]
+\endgroup
 
 \vspace{0.5cm}
 
 \begin{tcolorbox}[colback=gray!10, colframe=black!30, title={Sugerencia para esta sección}]
-  Usa el estilo APA 7 para citar fuentes académicas. Puedes utilizar herramientas como Zotero, Mendeley o Google Scholar para exportar referencias en BibTeX y usarlas con el paquete \texttt{biblatex} si deseas automatizar esta sección.
+    Usa el estilo APA 7 para citar fuentes académicas. Puedes utilizar herramientas como Zotero, Mendeley o Google Scholar para exportar referencias en formato BibTeX (.bib) y guardarlas en el archivo \texttt{bibliografia.bib}, ubicado en la carpeta \texttt{referencias}.
 \end{tcolorbox}
 
 \newpage
