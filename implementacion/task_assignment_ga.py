@@ -1,59 +1,3 @@
-"""app.py – Task Assignment GA API
-
-Flask API lista para desplegar en **Render.com**.
-================================================
-Esta versión expone el algoritmo genético como servicio REST.
-
-Endpoints principales
----------------------
-- **POST /optimize** → ejecuta el GA.  
-  Cuerpo JSON ↓
-  ```json
-  {
-    "tasks": [ {"id": 1, "name": "Tarea", "effort": 8, "complexity": 5,
-                 "dependencies": [], "skills_required": {"python": 6} }, ... ],
-    "developers": [ {"id": 1, "name": "Dev", "capacity": 72,
-                     "skill_levels": {"python": 7}, "cost_per_hour": 25}, ... ],
-    "config": {
-        "population": 300,
-        "generations": 500,
-        "mutation": 0.3,
-        "crossover": 0.9,
-        "tournament": 4,
-        "weights": {"makespan": 0.5, "variance": 0.2, "skill": 0.2, "cost": 0.1}
-    }
-  }
-  ```
-  Respuesta: JSON con `assignment`, `details`, `weights`.
-
-- **GET /health** → retorna `{"status": "ok"}` para checkeo de Render.
-
-Deploy rápido en Render
------------------------
-1. **requirements.txt**
-   ```
-   Flask==3.0.3
-   gunicorn==22.0.0
-   ````
-   (Añade el resto de dependencias estándar de Python 3 que ya trae Render).
-
-2. **Procfile**
-   ```
-   web: gunicorn app:app --preload --timeout 90
-   ```
-
-3. En Render → **New Web Service** con repo público/privado, build command `pip install -r requirements.txt`, start command `gunicorn app:app`.
-
-4. Etiqueta `PYTHON_VERSION` >= 3.11 si tu GA usa `slots=True` en dataclasses.
-
-Pruebas locales:
-```
-python app.py  # levanta Flask en localhost:5000
-curl -X POST http://localhost:5000/optimize -H "Content-Type: application/json" \
-     -d @payload.json
-```
-"""
-
 from __future__ import annotations
 
 import json
@@ -88,7 +32,7 @@ class Task:
     complexity: int  # 1‑10
     dependencies: List[int] = field(default_factory=list)
     skills_required: Dict[str, int] = field(default_factory=dict)
-
+    priority: str = "Medio"  # "Roja", "Amarillo", "Verde"
 
 @dataclass(slots=True)
 class Developer:
@@ -101,15 +45,16 @@ class Developer:
     def level(self, skill: str) -> int:
         return self.skill_levels.get(skill, 0)
 
-
 Chromosome = List[int]
 
 # =====================================================
 # === Utilidades de carga                             ===
 # =====================================================
 
-
 def load_tasks(raw_tasks: List[Dict[str, Any]]) -> List[Task]:
+    for t in raw_tasks:
+        if 'priority' not in t:
+            t['priority'] = 'Medio'
     return [Task(**t) for t in raw_tasks]
 
 
@@ -171,13 +116,13 @@ def evaluate_chrom(
             diff = max(0, req - dev.level(skill))
             penalty_skill += diff * task.complexity
 
-        # ── Capacidad de los desarrolladores ─────────────────────────
+    # Capacidad de los desarrolladores
     for d in devs:
         overflow = max(0, dev_effort[d.id] - d.capacity)
-        penalty_capacity += overflow * 100          # pesa bastante
+        penalty_capacity += overflow * 100
 
-    # Si hay *cualquier* overflow o skill gap extremo (> 25) marcamos inválido
-    if penalty_capacity > 0 or penalty_skill > 25:
+    # Penalización dura por overflow o skill gap extremo
+    if penalty_capacity > 0 or penalty_skill > 30:
         return BIG_PENALTY, {
             "invalid": True,
             "penalty_skill": penalty_skill,
@@ -213,18 +158,15 @@ def evaluate_chrom(
 def init_population(pop_size: int, dev_ids: List[int], length: int) -> List[Chromosome]:
     return [random.choices(dev_ids, k=length) for _ in range(pop_size)]
 
-
 def tournament(pop: List[Chromosome], k: int, cache: Dict[Tuple[int, ...], float]) -> Chromosome:
     cand = random.sample(pop, k)
     return min(cand, key=lambda c: cache[tuple(c)])
-
 
 def crossover(p1: Chromosome, p2: Chromosome) -> Tuple[Chromosome, Chromosome]:
     if len(p1) < 3:
         return p1[:], p2[:]
     a, b = sorted(random.sample(range(1, len(p1)), 2))
     return p1[:a] + p2[a:b] + p1[b:], p2[:a] + p1[a:b] + p2[b:]
-
 
 def mutate(ch: Chromosome, dev_ids: List[int], rate: float) -> None:
     for i in range(len(ch)):
@@ -300,11 +242,9 @@ def run_ga(
 
 app = Flask(__name__)
 
-
 @app.route("/health")
 def health():
     return {"status": "ok"}
-
 
 @app.route("/optimize", methods=["POST"])
 def optimize():
@@ -312,32 +252,55 @@ def optimize():
         payload = request.get_json(force=True)
         tasks_raw = payload.get("tasks")
         devs_raw = payload.get("developers")
+
         if not tasks_raw or not devs_raw:
             raise BadRequest("'tasks' y 'developers' son obligatorios")
+
         cfg = payload.get("config", {})
         tasks = load_tasks(tasks_raw)
         devs = load_devs(devs_raw)
         best_chrom, det = run_ga(tasks, devs, cfg)
-        assignment = {
-            t.id: next(d.name for d in devs if d.id == dev_id)
-            for t, dev_id in zip(topological_sort(tasks), best_chrom)
-        }
-        return jsonify(
-            {
-                "assignment": assignment,
-                "details": det,
-                "weights": cfg.get("weights", {"makespan": 0.5, "variance": 0.2, "skill": 0.2, "cost": 0.1}),
+
+        # Si el cromosoma es inválido, devolver error informativo
+        if det.get("invalid", False):
+            return jsonify({
+                "error": "No se encontró una solución válida",
+                "details": det
+            }), 422
+
+        assignment = {}
+        sprints: Dict[int, List[Dict[str, Any]]] = defaultdict(list)
+        for t, dev_id in zip(topological_sort(tasks), best_chrom):
+            start = det["task_start"][t.id]
+            sprint_num = start // DEFAULT_SPRINT_HOURS + 1
+            entry = {
+                "id": t.id,
+                "name": t.name,
+                "developer": next(d.name for d in devs if d.id == dev_id),
+                "priority": t.priority,
+                "start": start,
+                "finish": det["task_finish"][t.id]
             }
-        )
+            sprints[sprint_num].append(entry)
+            assignment[t.id] = entry
+
+        # Ordenar por prioridad dentro de cada sprint
+        priority_order = {"Roja": 1, "Amarillo": 2, "Verde": 3}
+        for sp in sprints.values():
+            sp.sort(key=lambda x: priority_order.get(x["priority"], 2))
+
+        return jsonify({
+            "assignment": assignment,
+            "sprints": sprints,
+            "details": det,
+            "weights": cfg.get("weights", {"makespan": 0.5, "variance": 0.2, "skill": 0.2, "cost": 0.1}),
+        })
+
     except BadRequest as e:
         return jsonify({"error": str(e)}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-# =====================================================
-# === CLI fallback                                    ===
-# =====================================================
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
