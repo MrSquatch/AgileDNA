@@ -74,6 +74,7 @@ from werkzeug.exceptions import BadRequest
 SPRINT_DAYS = 9
 HOURS_PER_DAY = 8
 DEFAULT_SPRINT_HOURS = SPRINT_DAYS * HOURS_PER_DAY
+BIG_PENALTY = 10_000_000            # castigo si el cromosoma es inválido
 
 # =====================================================
 # === Modelos de dominio                              ===
@@ -147,10 +148,10 @@ def evaluate_chrom(
     devs: List[Developer],
     w: Dict[str, float],
 ) -> Tuple[float, Dict[str, Any]]:
-    dev_timeline = {d.id: 0 for d in devs}
-    dev_effort = {d.id: 0 for d in devs}
+    dev_timeline: Dict[int, int] = {d.id: 0 for d in devs}
+    dev_effort: Dict[int, int] = {d.id: 0 for d in devs}
     task_start, task_finish = {}, {}
-    penalty_skill = 0.0
+    penalty_skill, penalty_capacity = 0.0, 0.0
 
     id2dev = {d.id: d for d in devs}
 
@@ -170,6 +171,19 @@ def evaluate_chrom(
             diff = max(0, req - dev.level(skill))
             penalty_skill += diff * task.complexity
 
+        # ── Capacidad de los desarrolladores ─────────────────────────
+    for d in devs:
+        overflow = max(0, dev_effort[d.id] - d.capacity)
+        penalty_capacity += overflow * 100          # pesa bastante
+
+    # Si hay *cualquier* overflow o skill gap extremo (> 25) marcamos inválido
+    if penalty_capacity > 0 or penalty_skill > 25:
+        return BIG_PENALTY, {
+            "invalid": True,
+            "penalty_skill": penalty_skill,
+            "penalty_capacity": penalty_capacity,
+        }
+
     makespan = max(task_finish.values())
     loads = list(dev_effort.values())
     mean_load = sum(loads) / len(loads)
@@ -184,6 +198,8 @@ def evaluate_chrom(
         "load_variance": load_var,
         "penalty_skill": penalty_skill,
         "cost_total": cost_total * 100,
+        "penalty_capacity": penalty_capacity,
+        "invalid": False,
         "task_start": task_start,
         "task_finish": task_finish,
         "dev_effort": dev_effort,
