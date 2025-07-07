@@ -72,7 +72,7 @@ class ApiService {
 
   constructor() {
     // Cambiar esta URL por la URL de tu API externa
-    this.baseUrl = 'http://localhost:8000/api/optimize';
+    this.baseUrl = 'http://127.0.0.1:5000/optimize';
   }
 
   async optimizeAssignment(request: OptimizationRequest): Promise<AssignmentResult> {
