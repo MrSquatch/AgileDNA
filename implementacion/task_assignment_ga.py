@@ -17,7 +17,7 @@ from werkzeug.exceptions import BadRequest
 # =====================================================
 SPRINT_DAYS = 9
 HOURS_PER_DAY = 8
-DEFAULT_SPRINT_HOURS = SPRINT_DAYS * HOURS_PER_DAY
+DEFAULT_SPRINT_HOURS = int((SPRINT_DAYS * HOURS_PER_DAY) / 4)
 BIG_PENALTY = 10_000_000            # castigo si el cromosoma es inválido
 
 # =====================================================
@@ -122,7 +122,7 @@ def evaluate_chrom(
         penalty_capacity += overflow * 100
 
     # Penalización dura por overflow o skill gap extremo
-    if penalty_capacity > 0 or penalty_skill > 30:
+    if penalty_capacity > 0 or penalty_skill > 50:
         return BIG_PENALTY, {
             "invalid": True,
             "penalty_skill": penalty_skill,
@@ -304,4 +304,4 @@ def optimize():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)  # Activa el modo debug
