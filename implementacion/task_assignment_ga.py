@@ -11,6 +11,7 @@ from typing import Dict, List, Sequence, Tuple, Any
 
 from flask import Flask, jsonify, request
 from werkzeug.exceptions import BadRequest
+from flask_cors import CORS  # <-- Importa CORS
 
 # =====================================================
 # === Parámetros globales                             ===
@@ -241,6 +242,7 @@ def run_ga(
 # =====================================================
 
 app = Flask(__name__)
+CORS(app)  # <-- Habilita CORS para todas las rutas
 
 @app.route("/health")
 def health():
