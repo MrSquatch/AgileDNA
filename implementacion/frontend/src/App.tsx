@@ -1,21 +1,23 @@
-import { Route, Routes } from "react-router-dom"
-import { Layout } from "./layaouts/Layout"
-import { Devs } from "./pages/Devs"
-import { Sprints } from "./pages/Sprints"
-import { Tasks } from "./pages/Tasks"
-import { Config } from "./pages/Config"
+import { Routes, Route } from 'react-router-dom';
+import { Login } from './components/Login';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { Layout } from './layaouts/Layout';
+import { Tasks, Devs, Sprints, Config } from './pages';
 
 function App() {
   return (
     <Routes>
-      <Route  path="/" element={<Layout />} >
-        <Route index element={<Tasks />} />
-        <Route path="/devs" element={<Devs />} />
-        <Route path="/sprints" element={<Sprints />} />
-        <Route path="/config" element={<Config />} />
+      <Route path="/login" element={<Login />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Tasks />} />
+          <Route path="devs" element={<Devs />} />
+          <Route path="sprints" element={<Sprints />} />
+          <Route path="config" element={<Config />} />
+        </Route>
       </Route>
     </Routes>
-  )
+  );
 }
 
-export default App
+export default App;
