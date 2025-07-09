@@ -125,7 +125,7 @@ export function GeneticResults() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-zinc-800 p-4 rounded-lg">
           <h4 className="text-sm font-medium text-zinc-400 mb-1">Makespan</h4>
-          <p className="text-2xl font-bold">{result.details.makespan} días</p>
+          <p className="text-2xl font-bold">{result.details.makespan} horas</p>
         </div>
         <div className="bg-zinc-800 p-4 rounded-lg">
           <h4 className="text-sm font-medium text-zinc-400 mb-1">Costo Total</h4>
@@ -155,9 +155,9 @@ export function GeneticResults() {
               </div>
               <div className="space-y-1 text-xs text-zinc-400">
                 <p><span className="font-medium">Desarrollador:</span> {task.developer}</p>
-                <p><span className="font-medium">Inicio:</span> día {task.start}</p>
-                <p><span className="font-medium">Fin:</span> día {task.finish}</p>
-                <p><span className="font-medium">Duración:</span> {task.finish - task.start} días</p>
+                <p><span className="font-medium">Inicio:</span> hora {task.start}</p>
+                <p><span className="font-medium">Fin:</span> hora {task.finish}</p>
+                <p><span className="font-medium">Duración:</span> {task.finish - task.start} horas</p>
               </div>
             </div>
           ))}
