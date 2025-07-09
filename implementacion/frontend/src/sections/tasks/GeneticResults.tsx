@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { apiService, type AssignmentResult, type Task, type Developer, type GeneticConfig } from '../../services';
 import { tasks, developers, geneticConfig } from './data';
+import { useConfig } from '../../hooks/useConfig';
 
 export function GeneticResults() {
+  const { config } = useConfig(geneticConfig);
   const [result, setResult] = useState<AssignmentResult | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -23,7 +25,7 @@ export function GeneticResults() {
       const request = {
         tasks,
         developers,
-        config: geneticConfig
+        config: config
       };
 
       // Intentar llamar a la API real primero
