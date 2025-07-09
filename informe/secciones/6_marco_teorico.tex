@@ -1,19 +1,38 @@
 \section{Marco Teórico}
 
-Según \textcite{scrum2020}, la asignación de tareas dentro de metodologías ágiles como SCRUM requiere un entendimiento profundo de conceptos relacionados con planificación de proyectos, inteligencia artificial y optimización. Los algoritmos genéticos, inspirados en los procesos evolutivos naturales, ofrecen una alternativa poderosa para resolver problemas complejos con múltiples variables y restricciones \parencite{goldberg}.
+La gestión ágil de proyectos ha revolucionado la forma en que los equipos de desarrollo organizan su trabajo. En particular, el marco metodológico SCRUM propone una estructura iterativa e incremental para el desarrollo de productos, basada en ciclos de trabajo denominados \textit{sprints} y en la colaboración constante entre los miembros del equipo \parencite{scrumguide2020}. Uno de los principales desafíos dentro de SCRUM es la asignación eficiente de tareas a los desarrolladores, lo que implica considerar factores como la carga de trabajo, las habilidades requeridas, las prioridades y las dependencias técnicas entre actividades.
 
-% … o, si quieres el apellido dentro del texto:
-% Según \textcite{goldberg}, los algoritmos genéticos ofrecen …
+En entornos reales, dicha asignación suele realizarse manualmente por un \textit{Scrum Master} o mediante juicio experto, lo cual puede introducir sesgos, sobrecarga en algunos miembros o secuencias ineficientes que retrasen el proyecto. Por ello, automatizar la asignación de tareas se vuelve una necesidad crítica para mejorar la eficiencia y la toma de decisiones en equipos ágiles \parencite{masood2017exploring}. Como señala \textcite{maiello2023task}, automatizar procesos dentro de metodologías ágiles puede representar una mejora significativa en términos de eficiencia y gestión operativa.
 
-Dentro del marco de este trabajo, se exploran teorías relacionadas con el problema del viajante (TSP), la gestión ágil de proyectos, técnicas de optimización y fundamentos de los algoritmos genéticos aplicados a software.
+Una técnica destacada para abordar problemas de asignación con múltiples restricciones es el uso de \textbf{algoritmos genéticos} (AG). Estos forman parte de la computación evolutiva y se inspiran en los principios de la selección natural y la genética biológica propuestos por Darwin. Introducidos formalmente por \textcite{holland1975adaptation}, los algoritmos genéticos permiten buscar soluciones óptimas o casi óptimas en espacios de búsqueda complejos donde las técnicas tradicionales de optimización resultan ineficaces.
 
-\vspace{0.5cm}
+El funcionamiento de un algoritmo genético parte de una población inicial de soluciones aleatorias (denominadas \textit{cromosomas}), que evolucionan mediante operadores como la selección, el cruce (\textit{crossover}) y la mutación. Cada solución se evalúa mediante una función de \textit{fitness}, la cual determina qué tan buena es en relación con el problema que se quiere resolver \parencite{goldberg1989genetic}.
 
-\begin{tcolorbox}[colback=gray!10,colframe=black!30,title={Sugerencias para esta sección}]
-    \begin{itemize}
-        \item Introduce brevemente conceptos como SCRUM, DevOps, optimización, TSP, etc.
-        \item Cita autores relevantes con formato APA 7 si es necesario.
-        \item Relaciona estos conceptos con el problema que estás abordando.
-        \item Puedes usar gráficos teóricos o tablas si fuera necesario.
-    \end{itemize}
-\end{tcolorbox}
+En el contexto de SCRUM, el cromosoma puede representar una asignación de tareas a desarrolladores. La función de fitness puede considerar criterios como el balance de carga, el cumplimiento de habilidades requeridas, el respeto por las dependencias y la minimización del costo total. Estudios como el de \textcite{garcia2014spsp} han demostrado que los algoritmos genéticos multiobjetivo son adecuados para resolver problemas complejos de planificación de proyectos de software, en los que se deben considerar simultáneamente restricciones como habilidades requeridas, precedencias entre tareas, tiempo de ejecución y costos.
+
+A su vez, existen antecedentes de problemas similares en la literatura, como el problema de asignación de personal (Staff Assignment Problem, SAP), en el que se busca distribuir empleados a tareas bajo múltiples restricciones y objetivos simultáneos. \textcite{peters2019staff} abordaron un caso real de este tipo en una firma de servicios profesionales, proponiendo un algoritmo genético multiobjetivo que superó en eficiencia y calidad de soluciones a métodos clásicos como la programación entera mixta (MIP). Su enfoque demostró que los algoritmos evolutivos pueden ofrecer soluciones altamente competitivas en contextos reales, incluso bajo limitaciones de tiempo y condiciones operativas complejas.
+
+
+En ese sentido, los algoritmos genéticos ofrecen una herramienta flexible y poderosa para resolver problemas de asignación en contextos ágiles, ya que permiten incorporar múltiples objetivos, adaptarse a restricciones cambiantes y explorar soluciones más allá de la intuición humana. Su uso en el presente proyecto permite simular un entorno realista y automatizado para la planificación eficiente de sprints en equipos SCRUM.
+
+
+
+% \section{Marco Teórico}
+
+% Según \textcite{scrum2020}, la asignación de tareas dentro de metodologías ágiles como SCRUM requiere un entendimiento profundo de conceptos relacionados con planificación de proyectos, inteligencia artificial y optimización. Los algoritmos genéticos, inspirados en los procesos evolutivos naturales, ofrecen una alternativa poderosa para resolver problemas complejos con múltiples variables y restricciones \parencite{goldberg}.
+
+% % … o, si quieres el apellido dentro del texto:
+% % Según \textcite{goldberg}, los algoritmos genéticos ofrecen …
+
+% Dentro del marco de este trabajo, se exploran teorías relacionadas con el problema del viajante (TSP), la gestión ágil de proyectos, técnicas de optimización y fundamentos de los algoritmos genéticos aplicados a software.
+
+% \vspace{0.5cm}
+
+% \begin{tcolorbox}[colback=gray!10,colframe=black!30,title={Sugerencias para esta sección}]
+%     \begin{itemize}
+%         \item Introduce brevemente conceptos como SCRUM, DevOps, optimización, TSP, etc.
+%         \item Cita autores relevantes con formato APA 7 si es necesario.
+%         \item Relaciona estos conceptos con el problema que estás abordando.
+%         \item Puedes usar gráficos teóricos o tablas si fuera necesario.
+%     \end{itemize}
+% \end{tcolorbox}

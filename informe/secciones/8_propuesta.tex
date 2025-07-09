@@ -1,16 +1,114 @@
 \section{Propuesta de Solución}
 
-La propuesta consiste en un sistema capaz de asignar automáticamente tareas a desarrolladores en base a un modelo evolutivo. El sistema considera el esfuerzo estimado por tarea, las dependencias entre ellas y la disponibilidad de los miembros del equipo.
+La propuesta presentada consiste en un sistema interactivo orientado a entornos ágiles, que permite optimizar la asignación de tareas dentro de un equipo de desarrollo mediante el uso de un algoritmo genético multiobjetivo. La solución busca balancear la carga de trabajo, minimizar el tiempo total de ejecución y considerar factores clave como dependencias, habilidades requeridas y costos asociados.
 
-El algoritmo genético es ajustado para minimizar el desequilibrio de carga, respetar las restricciones impuestas por los sprints y optimizar el flujo de trabajo. La solución incluye un módulo de visualización que muestra la distribución sugerida.
+El sistema se estructura en torno a una arquitectura modular que separa claramente la interfaz de usuario, la lógica de negocio y el motor de optimización. Esta separación permite una interacción clara y eficiente con el usuario, al mismo tiempo que encapsula la complejidad de la heurística evolutiva implementada.
 
-\vspace{0.5cm}
+En las siguientes subsecciones se detalla el modelo general del sistema, el diseño del algoritmo genético propuesto, y la forma en que los componentes se integran para generar una solución viable y extensible al problema de asignación de tareas.
 
-\begin{tcolorbox}[colback=gray!10, colframe=black!30, title={Sugerencias para esta sección}]
-    \begin{itemize}
-        \item Explica brevemente qué hace tu solución y cómo se integra en un entorno ágil.
-        \item Muestra capturas o diagramas si ya has hecho avances de código.
-        \item Puedes separar en módulos: asignación, evaluación, visualización.
-        \item Justifica por qué tu propuesta mejora lo que ya existe.
-    \end{itemize}
-\end{tcolorbox}
+\subsection{Modelo General del Sistema}
+
+Como se representó anteriormente en la Figura~\ref{fig:arquitectura}, el sistema está compuesto por tres componentes principales: \textbf{Interfaz Gráfica}, \textbf{API} y \textbf{Núcleo de Optimización}.
+
+\begin{itemize}
+    \item \textbf{Interfaz Gráfica}: Permite al usuario visualizar los resultados y configurar parámetros clave del algoritmo genético, como el tamaño de la población, número de generaciones, tasas de cruce y mutación, tamaño del torneo y los pesos de la función objetivo.
+
+    \item \textbf{API}: Recibe las configuraciones del usuario y los datos estáticos de tareas y desarrolladores. Actúa como intermediario entre la interfaz gráfica y el núcleo del algoritmo, enviando y recibiendo información a través de endpoints definidos en Flask.
+
+    \item \textbf{Núcleo de Optimización}: Implementado en Python, este módulo contiene la lógica completa del algoritmo genético. Se encarga de generar soluciones viables y optimizadas para la asignación de tareas, respetando restricciones de dependencias, habilidades, tiempos y costos.
+\end{itemize}
+
+Esta aproximación cliente-servidor con separación clara entre capas permite al usuario interactuar de forma sencilla con la aplicación, facilitando la configuración de parámetros y la visualización de resultados, todo mientras se mantiene encapsulada la complejidad interna del algoritmo genético multiobjetivo para la optimización de la asignación de tareas.
+
+\subsection{Algoritmo Genético Propuesto}
+
+El núcleo de optimización sigue un enfoque evolutivo, donde una población inicial de soluciones (cromosomas) se somete a iteraciones de evaluación, selección, cruce y mutación para mejorar la asignación de tareas.
+
+\begin{itemize}
+    \item Se parte de una población aleatoria de asignaciones.
+    \item Cada generación aplica operadores genéticos y se evalúan las soluciones.
+    \item La mejor solución se toma como sprint generado.
+    \item El proceso se repite hasta vaciar el backlog.
+\end{itemize}
+
+\noindent\textbf{Imagen:} \textit{(opcional)} flujograma simple del algoritmo. Ej: pseudodiagrama basado en 'while tareas\_pendientes:'.
+
+\subsection{Representación de Soluciones}
+
+Cada cromosoma representa una posible asignación de tareas a desarrolladores. Esta representación codifica:
+
+\begin{itemize}
+    \item Qué tareas se asignan a qué programadores.
+    \item El orden en que deben completarse (respetando dependencias).
+    \item El ajuste según las habilidades de cada desarrollador.
+\end{itemize}
+
+\noindent\textbf{Imagen:} \textit{(opcional)} ejemplo visual de un cromosoma o tabla de asignaciones (opcional si ya lo describes en texto).
+
+\subsection{Evaluación de Soluciones (Función Objetivo)}
+
+La función objetivo pondera múltiples criterios para determinar la calidad de una solución:
+
+\begin{itemize}
+    \item \textbf{Makespan (50\%)}: duración del sprint.
+    \item \textbf{Balance de carga (25\%)}: varianza en horas por developer.
+    \item \textbf{Coincidencia de habilidades (20\%)}: afinidad entre habilidades requeridas y ofrecidas.
+    \item \textbf{Costo (5\%)}: según tarifas por hora.
+\end{itemize}
+
+\noindent\textbf{Imagen:} \textit{(opcional)} fórmula matemática o pseudocódigo de evaluación.
+
+\subsection{Operadores Genéticos Personalizados}
+
+Los operadores han sido ajustados para respetar restricciones del problema:
+
+\begin{itemize}
+    \item \textbf{Selección:} por torneo.
+    \item \textbf{Cruce:} combinación parcial de asignaciones entre padres.
+    \item \textbf{Mutación:} reasignación de tareas con baja probabilidad.
+    \item \textbf{Corrección:} validación para evitar duplicados y tareas inválidas.
+\end{itemize}
+
+\noindent\textbf{Imagen:} no requerida, puede ser solo texto.
+
+\subsection{Interfaz y Configuración del Usuario}
+
+El sistema permite que el usuario ajuste los parámetros del algoritmo genético desde una interfaz web amigable:
+
+\begin{itemize}
+    \item Población inicial
+    \item Número de generaciones
+    \item Tasa de mutación y cruce
+    \item Tamaño del torneo
+    \item Pesos para cada criterio de evaluación
+\end{itemize}
+
+\noindent\textbf{Imagen:} captura del frontend (panel de configuración).
+
+\subsection{Ejemplo de Ejecución}
+
+Se realizó una ejecución completa con el conjunto estático de tareas y desarrolladores. Se configuraron los parámetros del algoritmo y se generaron varios sprints:
+
+\begin{itemize}
+    \item Se obtuvo un conjunto de sprints con carga balanceada.
+    \item Las tareas respetaron todas sus dependencias.
+    \item El makespan fue razonable para el conjunto dado.
+\end{itemize}
+
+\noindent\textbf{Imagen:} \textit{opcional} captura de los resultados visualizados (por ejemplo, tabla con desarrolladores y tareas).
+
+
+% La propuesta consiste en un sistema capaz de asignar automáticamente tareas a desarrolladores en base a un modelo evolutivo. El sistema considera el esfuerzo estimado por tarea, las dependencias entre ellas y la disponibilidad de los miembros del equipo.
+
+% El algoritmo genético es ajustado para minimizar el desequilibrio de carga, respetar las restricciones impuestas por los sprints y optimizar el flujo de trabajo. La solución incluye un módulo de visualización que muestra la distribución sugerida.
+
+% \vspace{0.5cm}
+
+% \begin{tcolorbox}[colback=gray!10, colframe=black!30, title={Sugerencias para esta sección}]
+%     \begin{itemize}
+%         \item Explica brevemente qué hace tu solución y cómo se integra en un entorno ágil.
+%         \item Muestra capturas o diagramas si ya has hecho avances de código.
+%         \item Puedes separar en módulos: asignación, evaluación, visualización.
+%         \item Justifica por qué tu propuesta mejora lo que ya existe.
+%     \end{itemize}
+% \end{tcolorbox}
