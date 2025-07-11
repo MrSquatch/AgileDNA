@@ -27,29 +27,37 @@ El núcleo del sistema implementa un \textbf{algoritmo genético multiobjetivo} 
 Como ya fue ilustrado en la Figura~\ref{fig:flujo}, el algoritmo parte de una población aleatoria de asignaciones. A través de ciclos generacionales, se aplican los operadores clásicos de selección, cruce y mutación, buscando mejorar progresivamente la calidad de las soluciones candidatas.
 
 \begin{itemize}
-    \item \textbf{Función de evaluación compuesta (multiobjetivo):} La aptitud de cada cromosoma se determina mediante una combinación ponderada de los siguientes objetivos:
-          \begin{itemize}
-              \item \textit{Makespan (tiempo total):} Representa la duración total del sprint generado. Minimizarlo busca reducir el tiempo de entrega general del proyecto.
-              \item \textit{Varianza de carga:} Evalúa el equilibrio en el esfuerzo asignado a cada desarrollador. Minimizarla ayuda a evitar sobrecargas individuales.
-              \item \textit{Coincidencia de habilidades:} Penaliza asignaciones en las que los desarrolladores no cumplen con los niveles de habilidad requeridos por las tareas. Esto incentiva una mejor correspondencia entre competencias y responsabilidades.
-              \item \textit{Costo total estimado:} Calculado en función del tiempo trabajado y el costo por hora de cada desarrollador. Busca reducir el impacto económico del plan generado.
-          \end{itemize}
-          Los pesos asignados a cada uno de estos criterios pueden ser definidos por el usuario a través de la interfaz del sistema.
+    \item \textbf{Función de evaluación compuesta (multiobjetivo):}  
+La aptitud de cada cromosoma se determina mediante una combinación ponderada de múltiples criterios:
+
+\begin{itemize}
+    \item \textbf{Makespan:} duración total del sprint.
+    \item \textbf{Balance de carga:} distribución equitativa del esfuerzo.
+    \item \textbf{Habilidades:} ajuste entre habilidades requeridas y ofrecidas.
+    \item \textbf{Costo estimado:} según tarifas por hora de cada desarrollador.
+\end{itemize}
+
+Los pesos asignados a cada uno de estos criterios pueden ser definidos por el usuario desde la interfaz del sistema. Este aspecto se detalla más adelante en la Sección~\ref{sec:evaluacion}.
 
     \item \textbf{Verificación previa y caché:} Se implementa una caché que almacena los valores de fitness ya evaluados para evitar recomputaciones innecesarias. Asimismo, las tareas se ordenan topológicamente antes del proceso evolutivo para asegurar que las dependencias entre ellas se respeten desde el inicio.
 
-    \item \textbf{Penalización por soluciones inválidas:} Si una asignación excede la capacidad de un desarrollador o presenta un desajuste extremo de habilidades, se le asigna una penalización severa (\texttt{BIG\_PENALTY}), lo que la descarta automáticamente de la población activa.
+    \item \textbf{Operadores genéticos personalizados:}  
+Se adaptaron los operadores clásicos del algoritmo genético para cumplir con las restricciones específicas del problema:
 
-    \item \textbf{Selección por torneo:} Se emplea una estrategia de selección por torneo, donde se elige el mejor individuo entre grupos aleatorios de tamaño configurable. Este método favorece la diversidad y evita la convergencia prematura hacia soluciones subóptimas.
+\begin{itemize}
+    \item \textbf{Selección por torneo:} elección competitiva aleatoria.
+    \item \textbf{Cruce por segmentos:} combina parcialmente asignaciones entre padres.
+    \item \textbf{Mutación por reasignación:} cambio aleatorio de tarea.
+    \item \textbf{Corrección posterior:} validación de soluciones generadas.
+    \item \textbf{Elitismo parcial:} preserva el mejor individuo en cada generación.
+\end{itemize}
 
-    \item \textbf{Operadores personalizados de cruce y mutación:} El cruce se realiza por segmentos aleatorios entre dos padres, y la mutación se aplica por gen con una probabilidad específica. Se evita asignar el mismo desarrollador en exceso o generar combinaciones inválidas.
-
-    \item \textbf{Estrategia de elitismo parcial:} En cada generación, se conserva el mejor cromosoma hallado hasta ese momento, asegurando que el progreso evolutivo no se pierda. Sin embargo, solo se mantiene una élite mínima para no restringir la exploración del espacio de búsqueda.
+Estos mecanismos se describen en detalle en la Sección~\ref{sec:operadores}.
 
     \item \textbf{Mecanismo de paciencia (estancamiento):} Si durante un número consecutivo de generaciones no se encuentra una mejor solución, el algoritmo se detiene anticipadamente, optimizando el tiempo de ejecución sin comprometer la calidad.
 \end{itemize}
 
-Este enfoque multiobjetivo permite una exploración equilibrada del espacio de soluciones, adaptándose a distintas prioridades definidas por el usuario y garantizando una asignación eficiente, válida y costo-efectiva de las tareas disponibles.
+Este enfoque multiobjetivo permite una exploración equilibrada del espacio de soluciones, adaptándose a prioridades definidas por el usuario y garantizando asignaciones válidas, eficientes y costo-efectivas de las tareas disponibles.
 
 % \subsection{Algoritmo Genético Propuesto}
 
@@ -115,6 +123,7 @@ Este conjunto final de cromosomas constituye la salida principal del algoritmo, 
 % \noindent\textbf{Imagen:} \textit{(opcional)} ejemplo visual de un cromosoma o tabla de asignaciones (opcional si ya lo describes en texto).
 
 \subsection{Evaluación de Soluciones (Función Objetivo)}
+\label{sec:evaluacion}
 
 La calidad de cada solución candidata —representada por un cromosoma— es evaluada mediante una función objetivo compuesta que pondera múltiples criterios relevantes para la planificación ágil de proyectos. Esta función busca minimizar los siguientes aspectos:
 
@@ -169,43 +178,119 @@ Esta función actúa como el eje central del proceso evolutivo, guiando la búsq
 % \noindent\textbf{Imagen:} \textit{(opcional)} fórmula matemática o pseudocódigo de evaluación.
 
 \subsection{Operadores Genéticos Personalizados}
+\label{sec:operadores}
 
-Los operadores han sido ajustados para respetar restricciones del problema:
+Una vez evaluadas las soluciones candidatas mediante la función objetivo, el algoritmo debe decidir cuáles de ellas continuarán participando en el proceso evolutivo. Para ello, se emplean los operadores genéticos clásicos propios de esta familia de algoritmos, como la selección, el cruce y la mutación, que permiten generar nuevas combinaciones de asignaciones a partir de las existentes.
 
-\begin{itemize}
-    \item \textbf{Selección:} por torneo.
-    \item \textbf{Cruce:} combinación parcial de asignaciones entre padres.
-    \item \textbf{Mutación:} reasignación de tareas con baja probabilidad.
-    \item \textbf{Corrección:} validación para evitar duplicados y tareas inválidas.
-\end{itemize}
+En nuestro contexto particular, dichos operadores fueron adaptados para respetar las restricciones del problema, evitando asignaciones inválidas y promoviendo la diversidad sin comprometer la validez de las soluciones. Esto dio lugar a un conjunto de operadores genéticos personalizados, cuya función es guiar de forma eficiente la exploración del espacio de soluciones, favoreciendo la mejora progresiva de la población en cada generación.
 
-\noindent\textbf{Imagen:} no requerida, puede ser solo texto.
-
-\subsection{Interfaz y Configuración del Usuario}
-
-El sistema permite que el usuario ajuste los parámetros del algoritmo genético desde una interfaz web amigable:
+A continuación se detallan los operadores personalizados implementados en el sistema:
 
 \begin{itemize}
-    \item Población inicial
-    \item Número de generaciones
-    \item Tasa de mutación y cruce
-    \item Tamaño del torneo
-    \item Pesos para cada criterio de evaluación
+\item \textbf{Selección por torneo:} Se elige aleatoriamente un subconjunto de soluciones candidatas y se selecciona la mejor entre ellas. Este método favorece un equilibrio entre explotación y diversidad, evitando la convergencia prematura a soluciones subóptimas.
+
+\item \textbf{Cruce por segmentos:} A partir de dos soluciones padres, se toma un segmento de asignaciones de uno de ellos y se completa la solución con los valores del otro, cuidando no violar restricciones como dependencias o exceso de carga por desarrollador.
+
+\item \textbf{Mutación por reasignación:} Con una baja probabilidad, se modifica la asignación de una tarea a otro desarrollador válido. Esta operación introduce variación genética y ayuda a explorar regiones no visitadas del espacio de búsqueda.
+
+\item \textbf{Corrección postoperadores:} Tras aplicar cruce o mutación, se verifica que la solución resultante sea válida. Esto incluye evitar duplicaciones indebidas, respetar capacidades, y garantizar el cumplimiento de las dependencias entre tareas.
+
+\item \textbf{Elitismo parcial:} En cada generación, se preserva el mejor cromosoma encontrado hasta el momento, garantizando que los avances evolutivos no se pierdan. Esta élite se mantiene limitada para no comprometer la diversidad genética de la población.
 \end{itemize}
 
-\noindent\textbf{Imagen:} captura del frontend (panel de configuración).
+Gracias a estos operadores personalizados, el algoritmo puede generar soluciones viables incluso en escenarios altamente restringidos, manteniendo un equilibrio entre exploración y explotación durante todo el proceso evolutivo.
 
-\subsection{Ejemplo de Ejecución}
+% \subsection{Operadores Genéticos Personalizados}
 
-Se realizó una ejecución completa con el conjunto estático de tareas y desarrolladores. Se configuraron los parámetros del algoritmo y se generaron varios sprints:
+% Los operadores han sido ajustados para respetar restricciones del problema:
 
-\begin{itemize}
-    \item Se obtuvo un conjunto de sprints con carga balanceada.
-    \item Las tareas respetaron todas sus dependencias.
-    \item El makespan fue razonable para el conjunto dado.
-\end{itemize}
+% \begin{itemize}
+%     \item \textbf{Selección:} por torneo.
+%     \item \textbf{Cruce:} combinación parcial de asignaciones entre padres.
+%     \item \textbf{Mutación:} reasignación de tareas con baja probabilidad.
+%     \item \textbf{Corrección:} validación para evitar duplicados y tareas inválidas.
+% \end{itemize}
 
-\noindent\textbf{Imagen:} \textit{opcional} captura de los resultados visualizados (por ejemplo, tabla con desarrolladores y tareas).
+% \noindent\textbf{Imagen:} no requerida, puede ser solo texto.
+
+\subsection{Interacción con la Interfaz Web}
+
+El sistema incluye una interfaz web intuitiva que permite al usuario gestionar todo el flujo de trabajo: carga de datos, configuración del algoritmo, ejecución del proceso evolutivo y visualización de resultados optimizados.
+
+\subsubsection{Visualización de Datos de Tareas y Desarrolladores}
+La interfaz incluye secciones dedicadas para consultar las tareas y desarrolladores definidos en el sistema. Estas páginas permiten al usuario revisar propiedades clave como esfuerzo estimado, habilidades requeridas, prioridades, capacidades y costos por hora.
+
+Si bien actualmente no se admite la carga dinámica de datos desde la interfaz, el sistema trabaja con un conjunto representativo de tareas y desarrolladores de prueba. Este conjunto es suficiente para validar el funcionamiento del algoritmo y visualizar sus resultados en un entorno controlado.
+
+\begin{figure}[htbp]
+    \centering
+\includegraphics[width=0.9\textwidth]{imagenes/web-tasks.png}
+    \caption{Pestaña de tablero de tareas disponibles.}
+    \label{fig:tareas}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/web-devs.png}
+    \caption{Pestaña de desarrolladores definidos.}
+    \label{fig:desarrolladores}
+\end{figure}
+
+\subsubsection{Configuración de Parámetros del Algoritmo}
+La interfaz permite ajustar los parámetros clave que gobiernan el comportamiento del algoritmo genético. Estos incluyen el tamaño de la población, el número máximo de generaciones, las tasas de cruce y mutación, el tamaño del torneo de selección, y los pesos asignados a cada uno de los criterios de evaluación.
+
+Esta configuración flexible permite experimentar con distintas estrategias evolutivas según las necesidades del usuario.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/web-config.png}
+    \caption{Panel de configuración del algoritmo genético.}
+    \label{fig:config}
+\end{figure}
+
+\subsubsection{Ejecución del Algoritmo y Visualización de Resultados}
+Una vez definidos los datos y parámetros, el usuario puede ejecutar el algoritmo desde la sección correspondiente. El sistema procesa las asignaciones y genera uno o varios sprints optimizados que se presentan visualmente.
+
+Cada resultado muestra qué tareas fueron asignadas a cada desarrollador, la duración del sprint (makespan) y la prioridad de las tareas incluidas, permitiendo evaluar rápidamente la calidad de la solución generada.
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.9\textwidth]{imagenes/web-sprints.png}
+    \caption{Visualización de los sprints generados por el algoritmo.}
+    \label{fig:resultados}
+\end{figure}
+
+\subsubsection*{Cierre del Proceso}
+
+Con esta secuencia completa —desde la visualización de los datos base, pasando por la configuración personalizada del algoritmo, hasta la ejecución del proceso evolutivo y la interpretación de sus resultados— se cubre todo el ciclo de uso del sistema propuesto.
+
+Este flujo integral permite al usuario obtener soluciones optimizadas de forma accesible y comprensible, facilitando así la toma de decisiones informadas dentro de contextos reales de planificación y asignación de tareas.
+
+% \subsection{Interfaz y Configuración del Usuario}
+
+% El sistema permite que el usuario ajuste los parámetros del algoritmo genético desde una interfaz web amigable:
+
+% \begin{itemize}
+%     \item Población inicial
+%     \item Número de generaciones
+%     \item Tasa de mutación y cruce
+%     \item Tamaño del torneo
+%     \item Pesos para cada criterio de evaluación
+% \end{itemize}
+
+% \noindent\textbf{Imagen:} captura del frontend (panel de configuración).
+
+% \subsection{Ejemplo de Ejecución}
+
+% Se realizó una ejecución completa con el conjunto estático de tareas y desarrolladores. Se configuraron los parámetros del algoritmo y se generaron varios sprints:
+
+% \begin{itemize}
+%     \item Se obtuvo un conjunto de sprints con carga balanceada.
+%     \item Las tareas respetaron todas sus dependencias.
+%     \item El makespan fue razonable para el conjunto dado.
+% \end{itemize}
+
+% \noindent\textbf{Imagen:} \textit{opcional} captura de los resultados visualizados (por ejemplo, tabla con desarrolladores y tareas).
 
 
 % La propuesta consiste en un sistema capaz de asignar automáticamente tareas a desarrolladores en base a un modelo evolutivo. El sistema considera el esfuerzo estimado por tarea, las dependencias entre ellas y la disponibilidad de los miembros del equipo.
