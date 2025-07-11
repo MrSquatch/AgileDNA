@@ -22,28 +22,104 @@ Esta aproximación cliente-servidor con separación clara entre capas permite al
 
 \subsection{Algoritmo Genético Propuesto}
 
-El núcleo de optimización sigue un enfoque evolutivo, donde una población inicial de soluciones (cromosomas) se somete a iteraciones de evaluación, selección, cruce y mutación para mejorar la asignación de tareas.
+El núcleo del sistema implementa un \textbf{algoritmo genético multiobjetivo} para resolver el problema de asignación de tareas bajo múltiples restricciones prácticas. Esta técnica de optimización evolutiva busca simultáneamente minimizar o balancear varios factores conflictivos mediante una \textit{función de evaluación compuesta}, lo cual distingue este enfoque de soluciones más simples o unidimensionales.
+
+Como ya fue ilustrado en la Figura~\ref{fig:flujo}, el algoritmo parte de una población aleatoria de asignaciones. A través de ciclos generacionales, se aplican los operadores clásicos de selección, cruce y mutación, buscando mejorar progresivamente la calidad de las soluciones candidatas.
 
 \begin{itemize}
-    \item Se parte de una población aleatoria de asignaciones.
-    \item Cada generación aplica operadores genéticos y se evalúan las soluciones.
-    \item La mejor solución se toma como sprint generado.
-    \item El proceso se repite hasta vaciar el backlog.
+    \item \textbf{Función de evaluación compuesta (multiobjetivo):} La aptitud de cada cromosoma se determina mediante una combinación ponderada de los siguientes objetivos:
+    \begin{itemize}
+        \item \textit{Makespan (tiempo total):} Representa la duración total del sprint generado. Minimizarlo busca reducir el tiempo de entrega general del proyecto.
+        \item \textit{Varianza de carga:} Evalúa el equilibrio en el esfuerzo asignado a cada desarrollador. Minimizarla ayuda a evitar sobrecargas individuales.
+        \item \textit{Coincidencia de habilidades:} Penaliza asignaciones en las que los desarrolladores no cumplen con los niveles de habilidad requeridos por las tareas. Esto incentiva una mejor correspondencia entre competencias y responsabilidades.
+        \item \textit{Costo total estimado:} Calculado en función del tiempo trabajado y el costo por hora de cada desarrollador. Busca reducir el impacto económico del plan generado.
+    \end{itemize}
+    Los pesos asignados a cada uno de estos criterios pueden ser definidos por el usuario a través de la interfaz del sistema.
+
+    \item \textbf{Verificación previa y caché:} Se implementa una caché que almacena los valores de fitness ya evaluados para evitar recomputaciones innecesarias. Asimismo, las tareas se ordenan topológicamente antes del proceso evolutivo para asegurar que las dependencias entre ellas se respeten desde el inicio.
+
+    \item \textbf{Penalización por soluciones inválidas:} Si una asignación excede la capacidad de un desarrollador o presenta un desajuste extremo de habilidades, se le asigna una penalización severa (\texttt{BIG\_PENALTY}), lo que la descarta automáticamente de la población activa.
+
+    \item \textbf{Selección por torneo:} Se emplea una estrategia de selección por torneo, donde se elige el mejor individuo entre grupos aleatorios de tamaño configurable. Este método favorece la diversidad y evita la convergencia prematura hacia soluciones subóptimas.
+
+    \item \textbf{Operadores personalizados de cruce y mutación:} El cruce se realiza por segmentos aleatorios entre dos padres, y la mutación se aplica por gen con una probabilidad específica. Se evita asignar el mismo desarrollador en exceso o generar combinaciones inválidas.
+
+    \item \textbf{Estrategia de elitismo parcial:} En cada generación, se conserva el mejor cromosoma hallado hasta ese momento, asegurando que el progreso evolutivo no se pierda. Sin embargo, solo se mantiene una élite mínima para no restringir la exploración del espacio de búsqueda.
+
+    \item \textbf{Mecanismo de paciencia (estancamiento):} Si durante un número consecutivo de generaciones no se encuentra una mejor solución, el algoritmo se detiene anticipadamente, optimizando el tiempo de ejecución sin comprometer la calidad.
 \end{itemize}
 
-\noindent\textbf{Imagen:} \textit{(opcional)} flujograma simple del algoritmo. Ej: pseudodiagrama basado en 'while tareas\_pendientes:'.
+Este enfoque multiobjetivo permite una exploración equilibrada del espacio de soluciones, adaptándose a distintas prioridades definidas por el usuario y garantizando una asignación eficiente, válida y costo-efectiva de las tareas disponibles.
+
+
+
+
+% \subsection{Algoritmo Genético Propuesto}
+
+% El núcleo de optimización sigue un enfoque evolutivo, donde una población inicial de soluciones (cromosomas) se somete a iteraciones de evaluación, selección, cruce y mutación para mejorar la asignación de tareas.
+
+% \begin{itemize}
+%     \item Se parte de una población aleatoria de asignaciones.
+%     \item Cada generación aplica operadores genéticos y se evalúan las soluciones.
+%     \item La mejor solución se toma como sprint generado.
+%     \item El proceso se repite hasta vaciar el backlog.
+% \end{itemize}
+
+% \noindent\textbf{Imagen:} \textit{(opcional)} flujograma simple del algoritmo. Ej: pseudodiagrama basado en 'while tareas\_pendientes:'.
 
 \subsection{Representación de Soluciones}
 
-Cada cromosoma representa una posible asignación de tareas a desarrolladores. Esta representación codifica:
+En el contexto del algoritmo genético propuesto, cada solución candidata —también llamada cromosoma— representa una asignación completa de tareas a desarrolladores para un sprint específico. Esta asignación se codifica como una lista ordenada de identificadores de desarrolladores, donde la posición de cada elemento corresponde a una tarea según un orden topológico que respeta las dependencias del proyecto.
 
+\medskip
+
+\textbf{Ejemplo de representación:}  
+Supóngase un conjunto de cuatro tareas ordenadas como $[T_0, T_1, T_2, T_3]$ y un cromosoma dado por la secuencia $[2, 1, 1, 3]$. Esto implica que:
 \begin{itemize}
-    \item Qué tareas se asignan a qué programadores.
-    \item El orden en que deben completarse (respetando dependencias).
-    \item El ajuste según las habilidades de cada desarrollador.
+    \item La tarea $T_0$ se asigna al desarrollador con ID 2.
+    \item La tarea $T_1$ se asigna al desarrollador con ID 1.
+    \item La tarea $T_2$ también se asigna al desarrollador 1.
+    \item La tarea $T_3$ se asigna al desarrollador con ID 3.
 \end{itemize}
 
-\noindent\textbf{Imagen:} \textit{(opcional)} ejemplo visual de un cromosoma o tabla de asignaciones (opcional si ya lo describes en texto).
+\medskip
+
+Dado que no todas las tareas pueden resolverse en un solo sprint —debido a restricciones de tiempo o dependencias—, el algoritmo aplica esta lógica de forma iterativa. Es decir, genera una secuencia de cromosomas (uno por sprint) hasta que se completa la asignación de todas las tareas del backlog. Cada uno de estos cromosomas constituye una solución parcial, y el conjunto completo representa la solución total del sistema.
+
+\medskip
+
+\noindent\textbf{Visualización sugerida:}  
+Una forma simple de representar esta asignación de manera legible es mediante una tabla con la siguiente estructura:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Sprint} & \textbf{Tarea} & \textbf{Desarrollador} & \textbf{Inicio (h)} & \textbf{Fin (h)} \\
+\hline
+1 & T0 & Dev 2 & 0 & 10 \\
+1 & T1 & Dev 1 & 0 & 12 \\
+1 & T2 & Dev 1 & 12 & 20 \\
+1 & T3 & Dev 3 & 0 & 15 \\
+\hline
+2 & T4 & Dev 2 & 0 & 10 \\
+\hline
+\end{tabular}
+\end{center}
+
+\noindent Esta tabla permite visualizar qué tareas se realizaron en cada sprint, a qué desarrolladores se asignaron y en qué rango de tiempo se ejecutaron, facilitando la comprensión de la solución generada por el algoritmo.
+
+
+% \subsection{Representación de Soluciones}
+
+% Cada cromosoma representa una posible asignación de tareas a desarrolladores. Esta representación codifica:
+
+% \begin{itemize}
+%     \item Qué tareas se asignan a qué programadores.
+%     \item El orden en que deben completarse (respetando dependencias).
+%     \item El ajuste según las habilidades de cada desarrollador.
+% \end{itemize}
+
+% \noindent\textbf{Imagen:} \textit{(opcional)} ejemplo visual de un cromosoma o tabla de asignaciones (opcional si ya lo describes en texto).
 
 \subsection{Evaluación de Soluciones (Función Objetivo)}
 
